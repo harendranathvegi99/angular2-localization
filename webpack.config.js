@@ -20,9 +20,10 @@ var isTestWatch = ENV === 'test-watch';
 var isTest = ENV === 'test' || isTestWatch;
 var isProd = ENV === 'build';
 var isi18nNative = ENV === 'i18n-native';
+var LOCALE = getArg('locale');
+var rootFolder = (isi18nNative ? 'i18nNative' : 'ng2Translate');
 
 module.exports = function makeWebpackConfig() {
-  console.log(ENV)
   /**
    * Config
    * Reference: http://webpack.github.io/docs/configuration.html
@@ -50,9 +51,9 @@ module.exports = function makeWebpackConfig() {
    * Reference: http://webpack.github.io/docs/configuration.html#entry
    */
   config.entry = isTest ? {} : {
-    'polyfills': './src/polyfills.ts',
-    'vendor': './src/vendor.ts',
-    'app': './src/main_' + (isi18nNative ? 'i18n-native' : 'ng2-translate') + '.ts' // our angular app
+    'polyfills': './src/' + rootFolder + '/polyfills.ts',
+    'vendor': './src/' + rootFolder + '/vendor.ts',
+    'app': './src/' + rootFolder + '/main.ts' // our angular app
   };
 
   /**
@@ -110,26 +111,29 @@ module.exports = function makeWebpackConfig() {
       // all css in src/style will be bundled in an external css file
       {
         test: /\.css$/,
-        exclude: root('src', 'app'),
+        exclude: root('src', rootFolder, 'app'),
         loader: isTest ? 'null' : ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: ['css', 'postcss']})
       },
       // all css required in src/app files will be merged in js files
-      {test: /\.css$/, include: root('src', 'app'), loader: 'raw!postcss'},
+      {test: /\.css$/, include: root('src', rootFolder, 'app'), loader: 'raw!postcss'},
 
       // support for .scss files
       // use 'null' loader in test mode (https://github.com/webpack/null-loader)
       // all css in src/style will be bundled in an external css file
       {
         test: /\.scss$/,
-        exclude: root('src', 'app'),
+        exclude: root('src', rootFolder, 'app'),
         loader: isTest ? 'null' : ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: ['css', 'postcss', 'sass']})
       },
       // all css required in src/app files will be merged in js files
-      {test: /\.scss$/, exclude: root('src', 'style'), loader: 'raw!postcss!sass'},
+      {test: /\.scss$/, exclude: root('src', rootFolder, 'style'), loader: 'raw!postcss!sass'},
 
       // support for .html as raw text
       // todo: change the loader to something that adds a hash to images
-      {test: /\.html$/, loader: 'raw',  exclude: root('src', 'public')}
+      {test: /\.html$/, loader: 'raw',  exclude: root('src', rootFolder, 'public')},
+
+      // load xlf files as raw text
+      {test: /\.xlf$/, loader: 'raw'}
     ]
   };
 
@@ -138,7 +142,7 @@ module.exports = function makeWebpackConfig() {
     config.module.rules.push({
       test: /\.ts$/,
       enforce: 'post',
-      include: path.resolve('src'),
+      include: path.resolve('src/' + rootFolder),
       loader: 'istanbul-instrumenter-loader',
       exclude: [/\.spec\.ts$/, /\.e2e\.ts$/, /node_modules/]
     });
@@ -164,7 +168,8 @@ module.exports = function makeWebpackConfig() {
     new webpack.DefinePlugin({
       // Environment helpers
       'process.env': {
-        ENV: JSON.stringify(ENV)
+        ENV: JSON.stringify(ENV),
+        LOCALE: JSON.stringify(LOCALE || 'en')
       }
     }),
 
@@ -172,7 +177,7 @@ module.exports = function makeWebpackConfig() {
       new webpack.ContextReplacementPlugin(
         // The (\\|\/) piece accounts for path separators in *nix and Windows
         /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
-        root('./src') // location of your src
+        root('./src/' + rootFolder) // location of your src
       ),
 
     // Tslint configuration for webpack 2
@@ -226,7 +231,7 @@ module.exports = function makeWebpackConfig() {
       // Inject script and link tags into html files
       // Reference: https://github.com/ampedandwired/html-webpack-plugin
       new HtmlWebpackPlugin({
-        template: './src/public/index.html',
+        template: './src/' + rootFolder + '/public/index.html',
         chunksSortMode: 'dependency'
       }),
 
@@ -255,7 +260,7 @@ module.exports = function makeWebpackConfig() {
       // Copy assets from the public folder
       // Reference: https://github.com/kevlened/copy-webpack-plugin
       new CopyWebpackPlugin([{
-        from: root('src/public')
+        from: root('src/' + rootFolder + 'public')
       }])
     );
   }
@@ -266,7 +271,7 @@ module.exports = function makeWebpackConfig() {
    * Reference: http://webpack.github.io/docs/webpack-dev-server.html
    */
   config.devServer = {
-    contentBase: './src/public',
+    contentBase: './src/' + rootFolder + '/public',
     historyApiFallback: true,
     quiet: true,
     stats: 'minimal' // none (or false), errors-only, minimal, normal (or true) and verbose
@@ -279,4 +284,11 @@ module.exports = function makeWebpackConfig() {
 function root(args) {
   args = Array.prototype.slice.call(arguments, 0);
   return path.join.apply(path, [__dirname].concat(args));
+}
+
+// return env argument by name
+function getArg(name) {
+  return process.argv.filter(function (argument) {
+    return argument.indexOf(name) === 0;
+  }).join().slice(name.length + 1);
 }

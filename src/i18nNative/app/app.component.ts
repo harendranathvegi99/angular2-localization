@@ -12,4 +12,9 @@ export class AppComponent {
   constructor() {
     // Do something with api
   }
+
+  changeLocale (locale) {
+    localStorage.setItem('locale', locale);
+    location.reload();
+  }
 }

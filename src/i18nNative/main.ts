@@ -1,6 +1,8 @@
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { AppModule } from './app-ng2Translate/app.module';
+
+import { getTranslationProviders } from './i18n-providers';
+import { AppModule } from './app/app.module';
 
 // depending on the env mode, enable prod mode or add debugging modules
 if (process.env.ENV === 'build') {
@@ -8,7 +10,9 @@ if (process.env.ENV === 'build') {
 }
 
 export function main() {
-  return platformBrowserDynamic().bootstrapModule(AppModule);
+  getTranslationProviders().then(providers => {
+    return platformBrowserDynamic().bootstrapModule(AppModule, { providers });
+  });
 }
 
 if (document.readyState === 'complete') {

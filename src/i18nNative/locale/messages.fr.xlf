@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+ <file source-language="en" datatype="plaintext" original="ng2.template">
+   <body>
+     <trans-unit id="c010ea92574acb64a24d7dc7387500e97d3d5a89" datatype="html">
+       <source>Hello here!</source>
+       <target>Bonjour ici!</target>
+     </trans-unit>
+     <trans-unit id="4d2c025feca86f803916f83d1b3e716a2fc12317" datatype="html">
+       <source>This is the base application with i18n native module.</source>
+       <target>Ceci est l'application de base avec le module natif de i18n.</target>
+     </trans-unit>
+     <trans-unit id="6a8921213888e91a739a8f86a71cd6293f3a7bcd" datatype="html">
+       <source>Here some examples with different tags.</source>
+       <target>Voici quelques exemples avec différentes tags.</target>
+     </trans-unit>
+   </body>
+ </file>
+</xliff>

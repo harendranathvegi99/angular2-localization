@@ -13,5 +13,8 @@
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,
     "useWebpackText": true
+  },
+  "angularCompilerOptions": {
+    "genDir": "./src/i18nNative/locale"
   }
 }

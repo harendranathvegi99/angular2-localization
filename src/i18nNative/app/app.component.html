@@ -1,8 +1,8 @@
 <header>
   <nav>
-    <a [routerLink]="['']">EN</a>
-    <a [routerLink]="['']">RU</a>
-    <a [routerLink]="['']">FR</a>
+    <a [routerLink]="['']" (click)="changeLocale('en')">EN</a>
+    <a [routerLink]="['']" (click)="changeLocale('de')">DE</a>
+    <a [routerLink]="['']" (click)="changeLocale('fr')">FR</a>
   </nav>
 </header>
 <main>
